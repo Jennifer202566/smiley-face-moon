@@ -2,23 +2,17 @@
   const cloudName = "dyfqyljwa";
   const uploadWidget = cloudinary.createUploadWidget({
     cloudName: cloudName,
-    uploadPreset: "smiley_moon_upload",
-    cropping: false, // 新增参数
-    sources: ["local"], // 限定本地文件上传
-    multiple: false, // 禁止多文件上传
-    clientAllowedFormats: ["jpg", "png"], // 限定格式
-    maxFileSize: 5000000 // 限制5MB
+    uploadPreset: "smileymoon_final",
+    // ...其他保持不变的参数...
   }, (error, result) => {
-    if (result && result.event === "success") {
-      // 修改后的URL生成方式（关键修正）
-      const safePublicId = result.info.public_id.replace(/\//g, ':');
-      const imageUrl = `https://res.cloudinary.com/${cloudName}/image/upload/c_fit,w_500/l_smiley_moon,fl_layer_apply,w_150,g_north_east,x_20,y_20,o_80/${safePublicId}`;
+    if (!error && result.event === "success") {
+      // 修改此行 ↓↓↓ 将 l_smiley_moon 改为 l_moon_wkji1g
+      const imageUrl = `https://res.cloudinary.com/${cloudName}/image/upload/c_limit,w_800/l_moon_wkji1g,w_150,g_north_east,x_20,y_20,o_80/fl_layer_apply/${result.info.public_id}`;
       
       document.getElementById("result").innerHTML = `
-        <img src="${imageUrl}" width="300" style="border:1px solid #ddd"/>
-        <a href="${imageUrl}" download style="display:block;margin-top:10px;padding:8px;background:#2196F3;color:white">Download</a>
+        <img src="${imageUrl}" width="100%" style="max-width:500px; border:1px solid #eee"/>
+        <a id="download" href="${imageUrl}" download="smileymoon.jpg">Download Image</a>
       `;
     }
   });
-  document.getElementById("upload_button").addEventListener("click", () => uploadWidget.open());
 </script>
