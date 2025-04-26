@@ -1,28 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Smiley Moon Generator</title>
-  <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
-</head>
-<body>
-  <h1>Upload Your Photo to Add a Smiley Moon!</h1>
-  <button id="upload_button" style="padding: 10px; background: #4CAF50; color: white; border: none; cursor: pointer;">Click to Upload</button>
-  <div id="result" style="margin-top: 20px;"></div>
-  <script>
-    const cloudName = "dyfqyljwa"; // 替换为仪表盘首页的Cloud Name
-    const uploadWidget = cloudinary.createUploadWidget({
-      cloudName: cloudName,
-      uploadPreset: "smiley_moon_upload" // 保持和Step 1中设置的Upload Preset名称一致
-    }, (error, result) => {
-      if (result.event === "success") {
-        const imageUrl = `https://res.cloudinary.com/${cloudName}/image/upload/l_smiley_moon,w_200,g_north_east,x_20,y_20,o_80/${result.info.public_id}.jpg`;
-        document.getElementById("result").innerHTML = `
-          <img src="${imageUrl}" width="300" style="border: 1px solid #ddd;"/>
-          <br/><a href="${imageUrl}" download="smiley_moon.jpg" style="display: inline-block; margin-top: 10px; padding: 8px 15px; background: #2196F3; color: white; text-decoration: none;">Download Image</a>
-        `;
-      }
-    });
-    document.getElementById("upload_button").addEventListener("click", () => uploadWidget.open());
-  </script>
-</body>
-</html>
+<script>
+  const cloudName = "dyfqyljwa";
+  const uploadWidget = cloudinary.createUploadWidget({
+    cloudName: cloudName,
+    uploadPreset: "smiley_moon_upload",
+    cropping: false, // 新增参数
+    sources: ["local"], // 限定本地文件上传
+    multiple: false, // 禁止多文件上传
+    clientAllowedFormats: ["jpg", "png"], // 限定格式
+    maxFileSize: 5000000 // 限制5MB
+  }, (error, result) => {
+    if (result && result.event === "success") {
+      // 修改后的URL生成方式（关键修正）
+      const safePublicId = result.info.public_id.replace(/\//g, ':');
+      const imageUrl = `https://res.cloudinary.com/${cloudName}/image/upload/c_fit,w_500/l_smiley_moon,fl_layer_apply,w_150,g_north_east,x_20,y_20,o_80/${safePublicId}`;
+      
+      document.getElementById("result").innerHTML = `
+        <img src="${imageUrl}" width="300" style="border:1px solid #ddd"/>
+        <a href="${imageUrl}" download style="display:block;margin-top:10px;padding:8px;background:#2196F3;color:white">Download</a>
+      `;
+    }
+  });
+  document.getElementById("upload_button").addEventListener("click", () => uploadWidget.open());
+</script>
