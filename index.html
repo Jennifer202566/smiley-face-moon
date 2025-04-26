@@ -1,4 +1,14 @@
-<script>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smiley Moon Generator</title>
+  <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+</head>
+<body>
+  <h1>Upload Your Photo to Add a Smiley Moon!</h1>
+  <button id="upload_button" style="padding: 10px; background: #4CAF50; color: white; border: none; cursor: pointer;">Click to Upload</button>
+  <div id="result" style="margin-top: 20px;"></div>
+ <script>
   const cloudName = "dyfqyljwa";
   const uploadWidget = cloudinary.createUploadWidget({
     cloudName: cloudName,
@@ -16,3 +26,5 @@
     }
   });
 </script>
+</body>
+</html>
