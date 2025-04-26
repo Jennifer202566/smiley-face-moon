@@ -3,28 +3,102 @@
 <head>
   <title>Smiley Moon Generator</title>
   <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+  <style>
+    #upload_button {
+      padding: 12px 24px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    #upload_button:hover { background: #45a049; }
+    #result { margin: 20px 0; }
+    #download-btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #2196F3;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 <body>
   <h1>Upload Your Photo to Add a Smiley Moon!</h1>
-  <button id="upload_button" style="padding: 10px; background: #4CAF50; color: white; border: none; cursor: pointer;">Click to Upload</button>
-  <div id="result" style="margin-top: 20px;"></div>
- <script>
-  const cloudName = "dyfqyljwa";
-  const uploadWidget = cloudinary.createUploadWidget({
-    cloudName: cloudName,
-    uploadPreset: "smileymoon_final",
-    // ...其他保持不变的参数...
-  }, (error, result) => {
-    if (!error && result.event === "success") {
-      // 修改此行 ↓↓↓ 将 l_smiley_moon 改为 l_moon_wkji1g
-      const imageUrl = `https://res.cloudinary.com/${cloudName}/image/upload/c_limit,w_800/l_moon_wkji1g,w_150,g_north_east,x_20,y_20,o_80/fl_layer_apply/${result.info.public_id}`;
+  <button id="upload_button">Click to Upload</button>
+  <div id="result"></div>
+
+  <script>
+    // 初始化检查
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("DOM fully loaded");
       
-      document.getElementById("result").innerHTML = `
-        <img src="${imageUrl}" width="100%" style="max-width:500px; border:1px solid #eee"/>
-        <a id="download" href="${imageUrl}" download="smileymoon.jpg">Download Image</a>
-      `;
-    }
-  });
-</script>
+      if (typeof cloudinary === "undefined") {
+        alert("错误：Cloudinary库加载失败，请检查网络连接");
+        return;
+      }
+
+      const cloudName = "dyfqyljwa";
+      const uploadPreset = "smileymoon_final";
+      
+      console.log("Initializing with:", { cloudName, uploadPreset });
+
+      const uploadWidget = cloudinary.createUploadWidget({
+        cloudName: cloudName,
+        uploadPreset: uploadPreset,
+        cropping: false,
+        sources: ["local"],
+        multiple: false,
+        clientAllowedFormats: ["jpg", "png", "jpeg"],
+        maxFileSize: 5000000,
+        showAdvancedOptions: true,
+        defaultSource: "local",
+        styles: {
+          palette: {
+            window: "#FFFFFF",
+            sourceBg: "#F4F4F4",
+            windowBorder: "#90A0B3",
+            tabIcon: "#000000",
+            inactiveTabIcon: "#555a5f",
+            menuIcons: "#555a5f",
+            link: "#0433FF",
+            action: "#339933",
+            inProgress: "#0433FF",
+            complete: "#339933",
+            error: "#cc0000"
+          }
+        }
+      }, (error, result) => {
+        console.log("Upload callback:", { error, result });
+        
+        if (!error && result.event === "success") {
+          const transformation = [
+            "c_limit,w_800",
+            "l_moon_wkji1g,w_150,g_north_east,x_20,y_20,o_80",
+            "fl_layer_apply"
+          ].join("/");
+          
+          const imageUrl = `https://res.cloudinary.com/${cloudName}/image/upload/${transformation}/${result.info.public_id}`;
+          
+          document.getElementById("result").innerHTML = `
+            <img src="${imageUrl}" style="max-width:100%; border:1px solid #ddd; margin-top:15px;"/>
+            <a id="download-btn" href="${imageUrl}" download="smileymoon_${Date.now()}.jpg">Download Image</a>
+          `;
+        } else if (error) {
+          console.error("Upload error:", error);
+          alert("上传失败: " + error.message);
+        }
+      });
+
+      document.getElementById("upload_button").addEventListener("click", function() {
+        console.log("Button clicked, opening widget...");
+        uploadWidget.open();
+      }, false);
+    });
+  </script>
 </body>
 </html>
